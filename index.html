@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sweet Quest: Custom Image Edition</title>
+    <title>Sweet Quest: Cat Bonus Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
@@ -12,12 +12,12 @@
             overflow: hidden;
             background-color: #2d3436;
             font-family: 'VT323', monospace;
-            touch-action: none; /* 禁止瀏覽器預設手勢 */
+            touch-action: none;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            -webkit-user-select: none; /* 禁止選取文字 */
+            -webkit-user-select: none;
             user-select: none;
         }
 
@@ -27,7 +27,7 @@
             max-width: 450px;
             height: 95%;
             max-height: 850px;
-            background: #a29bfe; /* 遊戲機外殼 */
+            background: #a29bfe;
             border-radius: 20px;
             padding: 15px 20px 25px 20px;
             box-sizing: border-box;
@@ -53,7 +53,6 @@
             height: 100%;
         }
 
-        /* UI 層 */
         #ui-layer {
             position: absolute;
             top: 15px;
@@ -72,7 +71,6 @@
             font-weight: bold;
         }
 
-        /* 開始畫面 */
         #overlay {
             position: absolute;
             top: 0;
@@ -100,7 +98,6 @@
             cursor: pointer;
             border-radius: 10px;
             animation: pulse 1.5s infinite;
-            /* 確保按鈕在手機上好按 */
             touch-action: manipulation;
             pointer-events: auto; 
             z-index: 30;
@@ -114,7 +111,6 @@
             100% { transform: scale(1); }
         }
 
-        /* 虛擬按鍵區 */
         .controls-area {
             height: 100px;
             display: flex;
@@ -134,7 +130,6 @@
         .d-pad-h { position:absolute; top:33px; left:10px; width:70px; height:24px; background:#2d3436; border-radius: 4px;}
         .d-pad-v { position:absolute; top:10px; left:33px; width:24px; height:70px; background:#2d3436; border-radius: 4px;}
         
-        /* 按鍵回饋 */
         .d-pad.active-left .d-pad-h { background: linear-gradient(90deg, #00b894 50%, #2d3436 50%); }
         .d-pad.active-right .d-pad-h { background: linear-gradient(90deg, #2d3436 50%, #00b894 50%); }
 
@@ -161,7 +156,6 @@
 
 <div id="game-border">
     <div id="screen-container">
-        <!-- 分數顯示 -->
         <div id="ui-layer">
             <div class="pixel-text">SCORE: <span id="score">0</span></div>
             <div class="pixel-text" style="color:#fd79a8">LV.<span id="level">1</span></div>
@@ -169,21 +163,19 @@
 
         <canvas id="gameCanvas"></canvas>
 
-        <!-- 開始畫面 -->
         <div id="overlay">
             <h1 style="font-size: 50px; margin: 0; color: #ffeaa7; text-shadow: 4px 4px 0 #e17055;">SWEET QUEST</h1>
             <p style="font-size: 20px; color: #fab1a0; margin-top:5px;">Yongyi's Macaron Challenge</p>
             
             <div style="margin-top:20px; font-size: 18px; color:#ccc;">
                 Touch LEFT / RIGHT to Move
+                <br><span style="color:#fff; font-size:16px;">(White Cat = 15 pts!)</span>
             </div>
             
-            <!-- 修正：加上 ontouchstart 讓手機反應更快 -->
             <button id="startBtn" onclick="startGame()" ontouchstart="startGame()">START GAME</button>
         </div>
     </div>
     
-    <!-- 裝飾按鈕 -->
     <div class="controls-area">
         <div class="d-pad" id="dpad-visual">
             <div class="d-pad-v"></div>
@@ -207,14 +199,13 @@
     const dpadVisual = document.getElementById('dpad-visual');
     const startBtn = document.getElementById('startBtn');
 
-    // --- 圖片載入 ---
+    // 圖片載入
     const bgImg = new Image();
     bgImg.src = 'https://static.wixstatic.com/media/ededed_4473b3774003426b89435743579a6aba~mv2.png';
 
     const dogImg = new Image();
     dogImg.src = 'https://static.wixstatic.com/media/ededed_42acc34d58e64a77ac952eacd3d24656~mv2.png';
 
-    // 遊戲參數
     let gameRunning = false;
     let score = 0;
     let frames = 0;
@@ -222,12 +213,9 @@
     let canvasW, canvasH;
 
     const player = {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-        speed: 8,
-        dx: 0
+        x: 0, y: 0,
+        width: 100, height: 100,
+        speed: 8, dx: 0
     };
 
     function resize() {
@@ -241,7 +229,6 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // 繪圖函式
     function drawBackground() {
         if (bgImg.complete && bgImg.naturalWidth !== 0) {
             ctx.drawImage(bgImg, 0, 0, canvasW, canvasH);
@@ -268,6 +255,46 @@
         }
     }
 
+    // --- 新增：繪製貓咪頭函式 ---
+    function drawCat(item) {
+        let cx = item.x + item.w / 2;
+        let cy = item.y + item.h / 2;
+        let r = item.w / 2;
+
+        // 貓耳 (三角形)
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        // 左耳
+        ctx.moveTo(cx - r + 5, cy - r/2);
+        ctx.lineTo(cx - r - 2, cy - r - 8);
+        ctx.lineTo(cx, cy - r);
+        // 右耳
+        ctx.moveTo(cx + r - 5, cy - r/2);
+        ctx.lineTo(cx + r + 2, cy - r - 8);
+        ctx.lineTo(cx, cy - r);
+        ctx.fill();
+
+        // 貓臉 (圓形)
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 眼睛
+        ctx.fillStyle = "#333";
+        ctx.beginPath();
+        ctx.arc(cx - 10, cy - 2, 3, 0, Math.PI * 2);
+        ctx.arc(cx + 10, cy - 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 鼻子
+        ctx.fillStyle = "#ff7675";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 6, 4, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 繪製馬卡龍
     function drawMacaron(item) {
         let cx = item.x + item.w / 2;
         let cy = item.y + item.h / 2;
@@ -298,18 +325,44 @@
     }
 
     function createItem() {
-        const isBig = Math.random() < 0.3;
-        const w = isBig ? 55 : 35;
-        const h = isBig ? 30 : 20;
+        const rand = Math.random();
         
-        items.push({
-            x: Math.random() * (canvasW - w),
-            y: -50,
-            w: w, h: h,
-            speed: isBig ? 3 : 5,
-            points: isBig ? 11 : 5,
-            color: ['#fd79a8', '#a29bfe', '#55efc4', '#ffeaa7', '#fab1a0'][Math.floor(Math.random()*5)]
-        });
+        // 10% 機率是貓咪 (15分)
+        if (rand < 0.1) {
+            items.push({
+                type: 'cat',
+                x: Math.random() * (canvasW - 45),
+                y: -50,
+                w: 45, h: 40,
+                speed: 6, // 貓咪掉比較快
+                points: 15,
+                color: '#fff'
+            });
+        } 
+        // 30% 機率是特大馬卡龍 (11分)
+        else if (rand < 0.4) {
+            items.push({
+                type: 'macaron',
+                x: Math.random() * (canvasW - 55),
+                y: -50,
+                w: 55, h: 30,
+                speed: 3,
+                points: 11,
+                color: ['#fd79a8', '#a29bfe', '#55efc4', '#ffeaa7', '#fab1a0'][Math.floor(Math.random()*5)]
+            });
+        } 
+        // 60% 機率是普通馬卡龍 (5分)
+        else {
+            items.push({
+                type: 'macaron',
+                x: Math.random() * (canvasW - 35),
+                y: -50,
+                w: 35, h: 20,
+                speed: 5,
+                points: 5,
+                color: ['#fd79a8', '#a29bfe', '#55efc4', '#ffeaa7', '#fab1a0'][Math.floor(Math.random()*5)]
+            });
+        }
     }
 
     function update() {
@@ -341,7 +394,12 @@
             let item = items[i];
             item.y += item.speed + (score / 300);
             
-            drawMacaron(item);
+            // 根據類型決定畫什麼
+            if (item.type === 'cat') {
+                drawCat(item);
+            } else {
+                drawMacaron(item);
+            }
 
             if (
                 item.x < player.x + player.width &&
@@ -361,7 +419,7 @@
         requestAnimationFrame(update);
     }
 
-    // --- 控制邏輯 ---
+    // 控制邏輯
     const keys = { left: false, right: false };
 
     // 鍵盤
@@ -374,9 +432,7 @@
         if (e.key === 'ArrowRight') { keys.right = false; dpadVisual.classList.remove('active-right'); }
     });
 
-    // --- 關鍵修正：手機觸控邏輯 ---
-    
-    // 全域防止滑動，但要避開遊戲開始前的按鈕
+    // 觸控
     document.body.addEventListener('touchmove', function(e) { 
         if (gameRunning) {
             e.preventDefault(); 
@@ -384,15 +440,13 @@
     }, { passive: false });
 
     container.addEventListener('touchstart', (e) => {
-        // ★ 1. 如果按到的是按鈕，絕對不要 preventDefault，直接讓它執行點擊
         if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
             return;
         }
 
-        // ★ 2. 只有在遊戲進行中，才執行移動邏輯 & 阻止畫面捲動
         if (e.cancelable) e.preventDefault();
         
-        if (!gameRunning) return; // 遊戲沒開始就跳出
+        if (!gameRunning) return;
 
         const touchX = e.touches[0].clientX;
         const rect = container.getBoundingClientRect();
@@ -407,7 +461,6 @@
     }, { passive: false });
 
     container.addEventListener('touchend', (e) => {
-        // 同樣避開按鈕
         if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
             return;
         }
@@ -421,7 +474,6 @@
     });
 
     function startGame(e) {
-        // 防止事件冒泡造成的重複觸發
         if(e) e.stopPropagation();
         
         overlay.style.display = 'none';
